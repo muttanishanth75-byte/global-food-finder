@@ -3,7 +3,7 @@ import streamlit as st
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="Global Food Finder", page_icon="🌎")
 
-# Custom CSS for a professional "Startup" look
+# Custom CSS for the "Pro" Look
 st.markdown("""
     <style>
     .main { background-color: #f8f9fa; }
@@ -15,58 +15,73 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         margin-bottom: 20px;
     }
-    .stButton>button { border-radius: 10px; height: 3em; background-color: #FF4B4B; color: white; }
+    .stButton>button { border-radius: 10px; height: 3em; background-color: #FF4B4B; color: white; font-weight: bold; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- THE DATABASE ---
+# --- THE GLOBAL DATABASE ---
 data = {
     "London": [
         {"name": "Saravana Bhavan", "type": "South India", "dish": "Ghee Roast Dosa", "area": "Leicester Square", "tip": "Just like Chennai!"},
-        {"name": "Dishoom", "type": "North India", "dish": "Chicken Ruby", "area": "Covent Garden", "tip": "Expect a wait, but it's worth it."}
+        {"name": "Dishoom", "type": "North India", "dish": "Chicken Ruby", "area": "Covent Garden", "tip": "Long queues, but worth the wait."}
     ],
     "Paris": [
-        {"name": "Chennai Dosa", "type": "South India", "dish": "Masala Dosa", "area": "Gare du Nord", "tip": "Authentic hub for Tamil food."}
+        {"name": "Chennai Dosa", "type": "South India", "dish": "Masala Dosa", "area": "Gare du Nord", "tip": "The hub for Tamil flavors in France."}
     ],
     "Dubai": [
-        {"name": "Sangeetha", "type": "South India", "dish": "Mini Tiffin", "area": "Karama", "tip": "Great for families."},
-        {"name": "Gazebo", "type": "North India", "dish": "Lucknowi Biryani", "area": "City Centre", "tip": "Very royal vibes."}
+        {"name": "Sangeetha Vegetarian", "type": "South India", "dish": "Mini Tiffin", "area": "Karama", "tip": "Best breakfast spot for families."},
+        {"name": "Gazebo", "type": "North India", "dish": "Lucknowi Biryani", "area": "Multiple Locations", "tip": "Very royal and authentic."}
+    ],
+    "Singapore": [
+        {"name": "Komala Vilas", "type": "South India", "dish": "Bhattura", "area": "Little India", "tip": "Legendary spot since 1947."}
     ]
 }
 
-# --- UI ---
-st.title("🌍 Global Food Finder")
-st.write("Find authentic home-style food in top tourist cities.")
-
+# --- SIDEBAR & IDENTITY ---
+st.sidebar.title("🍱 Preferences")
 home_region = st.sidebar.selectbox("Where are you from?", ["South India", "North India"])
-current_city = st.text_input("Enter city (e.g., London, Paris, Dubai):")
 
-if st.button("Search Restaurants 🔍"):
+# THE BIG FLEX
+st.sidebar.markdown("---")
+st.sidebar.write("🚀 Developed by:")
+st.sidebar.subheader("Mutta Nishanth") 
+
+# --- MAIN UI ---
+st.title("🌍 Global Food Finder")
+st.write("Find a taste of home in top tourist cities across the world.")
+
+current_city = st.text_input("Which city are you in?", placeholder="e.g. London, Dubai, Paris...")
+
+if st.button("Find My Food 🔍"):
+    # .title() ensures "london" and "London" both work!
     city_key = current_city.title()
+    
     if city_key in data:
-        results = [r for r in data[city_key] if r['type'] == home_region]
+        results = [res for res in data[city_key] if res["type"] == home_region]
         if results:
+            st.success(f"Found {len(results)} {home_region} spots in {city_key}!")
             for place in results:
                 st.markdown(f"""
                 <div class="restaurant-card">
                     <h3>🏠 {place['name']}</h3>
-                    <p><b>🍲 Dish:</b> {place['dish']} | <b>📍 Area:</b> {place['area']}</p>
-                    <p><i>"{place['tip']}"</i></p>
+                    <p><b>🍲 Signature Dish:</b> {place['dish']}</p>
+                    <p><b>📍 Neighborhood:</b> {place['area']}</p>
+                    <p><b>💡 Pro Tip:</b> {place['tip']}</p>
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            st.warning(f"We don't have {home_region} spots in {city_key} yet!")
+            st.warning(f"We know {city_key}, but we haven't found a {home_region} spot there yet!")
     else:
-        st.error("City not found in our current database.")
-        st.info("We are adding 50+ new countries soon!")
+        st.error(f"Sorry! Our scouts haven't reached {city_key} yet.")
 
-# --- THE "INFINITE" FEATURE ---
+# --- THE INFINITE GROWTH FORM ---
 st.markdown("---")
-st.subheader("📩 Help us expand!")
-with st.expander("Can't find a city? Suggest a restaurant here"):
-    with st.form("suggestion_form"):
-        new_city = st.text_input("City Name")
-        new_res = st.text_input("Restaurant Name")
-        submitted = st.form_submit_with_button("Submit Suggestion")
+st.subheader("📩 Help us go Infinite!")
+with st.expander("Is your favorite restaurant missing? Add it here:"):
+    with st.form("add_form"):
+        user_city = st.text_input("City Name")
+        user_res = st.text_input("Restaurant Name")
+        user_type = st.selectbox("Type", ["South India", "North India"])
+        submitted = st.form_submit_with_button("Submit to Mutta Nishanth")
         if submitted:
-            st.success("Thanks! Our scouts will verify this restaurant soon.")
+            st.success("Thanks! I'll verify and add this to the global database.")
